@@ -4,8 +4,10 @@ Read nabaztag / ztamp:s rfid with mir:ror and arduino
 Semplice tentativo di leggere gli rfid del nabaztag tramite mirror e arduino.
 
 Occorrente:
-arduino uno 
+arduino uno
+
 USB Host Shield Library 2.0 (MAX3421)
+
 qualcosa per vedere il risultato per esempio LCD 1602 i2c
 
 libreria:
