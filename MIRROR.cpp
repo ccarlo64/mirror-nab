@@ -243,27 +243,20 @@ uint8_t MIRROR::Poll() {
 }
 
 
-void MIRROR::Light_Command(uint8_t *data, uint16_t nbytes) {
+void MIRROR::SendCommand(uint8_t *data, uint16_t nbytes) {
         #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nLight command "), 0x80);
+        Notify(PSTR("\r\nSend command "), 0x80);
         #endif
-        pUsb->outTransfer(bAddress, epInfo[ MIRROR_OUTPUT_PIPE ].epAddr, nbytes, data);
+        uint8_t rcode;
+                uint16_t BUFFER_SIZE = EP_MAXPKTSIZE;
+        rcode=pUsb->outTransfer(bAddress, epInfo[ MIRROR_INPUT_PIPE ].epAddr, BUFFER_SIZE, data);
+	Notify(PSTR("\r\nSend command "), 0x80);        
+        Notify(PSTR("\r\nrcode: "), 0x80);
+	D_PrintHex<uint8_t > (rcode, 0x80);    
 }
 
-/*
-void MIRROR::setLight(uint8_t ambx_light, uint8_t r, uint8_t g, uint8_t b) {
-        writeBuf[0] = MIRROR_PREFIX_COMMAND;
-        writeBuf[1] = ambx_light;
-        writeBuf[2] = MIRROR_SET_COLOR_COMMAND;
-        writeBuf[3] = r;
-        writeBuf[4] = g;
-        writeBuf[5] = b;
-        Light_Command(writeBuf, MIRROR_LIGHT_COMMAND_BUFFER_SIZE);
-}
 
-*/
-
-uint8_t  MIRROR::getTag( uint8_t *rr ) {
+uint8_t  MIRROR::GetTag( uint8_t *rr ) {
 	uint8_t rcode;
 	uint8_t pollInterval;
 	pollInterval=10;
@@ -275,116 +268,27 @@ uint8_t  MIRROR::getTag( uint8_t *rr ) {
 #ifdef PRINTREPORT
       //  printReport(BUFFER_SIZE); // Uncomment "#define PRINTREPORT" to print the report send by the Xbox controller
 #endif
-
+#ifdef DEBUG_USB_HOST
 	if(rr[0]!=0) {
 
 		Notify(PSTR("\r\nlen: "), 0x80);
 		D_PrintHex<uint8_t > (BUFFER_SIZE, 0x80);
 		Notify(PSTR("\r\nrcode: "), 0x80);
 		D_PrintHex<uint8_t > (rcode, 0x80);
+		
+		Notify(PSTR("\r\n - "), 0x80);
 		Notify(PSTR("BUFFER: "), 0x80);
 
-		for(int i = 0; i < 32; i++) {
+		for(int i = 0; i <BUFFER_SIZE ; i++) {
 			D_PrintHex<uint8_t > (rr[i], 0x80);
 		}
 	}
-
-
-
-
-/*
-if(rcode!=0) {
-    aa=8;
-    uint8_t msg1[10] = { 0x1F, 0x01, 0x25, 0x00, 0xC4, 0x00, 0x25, 0x03 };
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_INPUT_PIPE ].epAddr, aa, msg1 );    
-Notify(PSTR("\r\nrcode1: "), 0x80);
-D_PrintHex<uint8_t > (rcode, 0x80);    
-    uint8_t msg2[10] = { 0x00, 0x01, 0x25, 0x00, 0xC4, 0x00, 0x25, 0x04 }; 
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_INPUT_PIPE ].epAddr, aa, msg2 );    
-Notify(PSTR("\r\nrcode2: "), 0x80);
-D_PrintHex<uint8_t > (rcode, 0x80);    
-    delay(500);
-    uint8_t msg3[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x25, 0x05 };
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_INPUT_PIPE ].epAddr, aa, msg3 ); 
-  Notify(PSTR("\r\nrcode3: "), 0x80);
-  D_PrintHex<uint8_t > (rcode, 0x80);
-  Notify(PSTR("\r\nOUT: "), 0x80);
-  }
-*/ 
+#endif
 
 	return rr[0];
 	}
-/*
-        writeBuf[0] = MIRROR_PREFIX_COMMAND;
-        writeBuf[1] = ambx_light;
-        writeBuf[2] = MIRROR_SET_COLOR_COMMAND;
-        writeBuf[3] = r;
-        writeBuf[4] = g;
-        writeBuf[5] = b;
-  
-        Notify(PSTR("\r\nlegge mirror "), 0x80);
-  
-        rcode = pUsb->inTransfer( bAddress, epInfo[ MIRROR_OUTPUT_PIPE ].epAddr, &aa, writeBuf );     
-Notify(PSTR("\r\nBUFFER: "), 0x80);
-D_PrintHex<uint8_t > (writeBuf[0], 0x80);
-D_PrintHex<uint8_t > (writeBuf[1], 0x80);
-D_PrintHex<uint8_t > (writeBuf[2], 0x80);
-D_PrintHex<uint8_t > (writeBuf[3], 0x80);
-D_PrintHex<uint8_t > (writeBuf[4], 0x80);
-D_PrintHex<uint8_t > (writeBuf[5], 0x80);
-D_PrintHex<uint8_t > (writeBuf[6], 0x80);
-D_PrintHex<uint8_t > (writeBuf[7], 0x80);
-Notify(PSTR("\r\nrcode di intrasfer: "), 0x80);
-D_PrintHex<uint8_t > (rcode, 0x80);    
-    if (writeBuf[8] ==0 ){ 
-    aa=8;
-    uint8_t msg1[10] = { 0x1F, 0x01, 0x25, 0x00, 0xC4, 0x00, 0x25, 0x03 };
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_OUTPUT_PIPE ].epAddr, aa, msg1 );    
-Notify(PSTR("\r\nrcode1: "), 0x80);
-D_PrintHex<uint8_t > (rcode, 0x80);    
-    uint8_t msg2[10] = { 0x00, 0x01, 0x25, 0x00, 0xC4, 0x00, 0x25, 0x04 }; 
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_OUTPUT_PIPE ].epAddr, aa, msg2 );    
-Notify(PSTR("\r\nrcode2: "), 0x80);
-D_PrintHex<uint8_t > (rcode, 0x80);    
-    delay(500);
-    uint8_t msg3[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x25, 0x05 };
-    rcode = pUsb->outTransfer( bAddress, epInfo[ MIRROR_OUTPUT_PIPE ].epAddr, aa, msg3 ); 
-  Notify(PSTR("\r\nrcode3: "), 0x80);
-  D_PrintHex<uint8_t > (rcode, 0x80);
-  Notify(PSTR("\r\nOUT: "), 0x80);
-    return; } // return if nothing happened
 
 
-
-
-                Notify(PSTR("\r\ncodice: "), 0x80);
-                D_PrintHex<uint8_t > (rcode, 0x80);         
-//        Light_Command(writeBuf, MIRROR_LIGHT_COMMAND_BUFFER_SIZE);
-
-}
-*/
-/*
-
-void MIRROR::xxx(uint8_t buf[sizeof (USB_DEVICE_DESCRIPTOR)]) {
-uint8_t rcode;
-rcode = Usb.inTransfer( 0, 0, 0x40, buf );
-
-
-}
-*/
-/*
-void MIRROR::setLight(AmbxLightsEnum ambx_light, AmbxColorsEnum color) { // Use this to set the Light with Color using the predefined in "MIRROREnums.h"
-        setLight(ambx_light, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-}
-
-void MIRROR::setAllLights(AmbxColorsEnum color) { // Use this to set the Color using the predefined colors in "MIRROREnums.h"
-        setLight(Sidelight_left, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-        setLight(Sidelight_right, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-        setLight(Wallwasher_center, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-        setLight(Wallwasher_left, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-        setLight(Wallwasher_right, (uint8_t)(color >> 16), (uint8_t)(color >> 8), (uint8_t)(color));
-}
-*/
 void MIRROR::onInit() {
         #ifdef DEBUG_USB_HOST
         Notify(PSTR("\r\nOnInit execute "), 0x80);

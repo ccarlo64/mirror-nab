@@ -115,9 +115,9 @@ public:
         /**@}*/
 
 
-	uint8_t getTag( uint8_t *rr );
+	uint8_t GetTag( uint8_t *rr );
 	
-	
+	void SendCommand(uint8_t *data, uint16_t nbytes);
 	
         /**
          * Use this to set the Color using RGB values.
@@ -166,7 +166,7 @@ private:
         uint8_t writeBuf[MIRROR_EP_MAXPKTSIZE]; // General purpose buffer for output data
 
         /* Private commands */
-        void Light_Command(uint8_t *data, uint16_t nbytes);
+//        void Light_Command(uint8_t *data, uint16_t nbytes);
         
 };
 
