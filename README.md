@@ -1,5 +1,7 @@
 # mirror-nab
 Read nabaztag / ztamp:s rfid with mir:ror and arduino
+https://youtube.com/shorts/VSwC1_YKVTI
+
 
 Semplice tentativo di leggere gli rfid del nabaztag tramite mirror e arduino.
 
